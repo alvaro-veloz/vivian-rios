@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dra. Johana Dávila — Medicina General | Parroquia Santiago, San Miguel de Bolívar</title>
+  <meta name="description" content="Dra. Johana Dávila, médica rural en la parroquia Santiago, San Miguel de Bolívar. Graduada UDLA Quito. Atención general, preventiva y humana." />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://www.drajohana.com/" />
+  <meta property="og:title"       content="Dra. Johana Dávila — Medicina General" />
+  <meta property="og:description" content="Médica rural en la parroquia Santiago, San Miguel de Bolívar. Formada en la UDLA, con vocación humana y enfoque preventivo." />
+  <meta property="og:image"       content="https://www.drajohana.com/assets/og-image.jpg" />
+  <meta property="og:locale"      content="es_EC" />
+  <meta name="twitter:card"       content="summary_large_image" />
+  <meta name="twitter:title"      content="Dra. Johana Dávila — Medicina General" />
+  <meta name="twitter:description" content="Médica rural con vocación humana en la parroquia Santiago, San Miguel de Bolívar." />
+  <meta name="twitter:image"      content="https://www.drajohana.com/assets/og-image.jpg" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230e1117'/><path d='M16 9c-1.9 0-3.5 1-4.3 2.5C10.9 10 9.3 9 7.5 9 5 9 3 11 3 13.5c0 4.5 13 11.5 13 11.5s13-7 13-11.5C29 11 27 9 24.5 9c-1.8 0-3.4 1-4.2 2.5C19.5 10 17.9 9 16 9z' fill='%23C17F59'/></svg>" />
+  <link rel="apple-touch-icon" href="assets/favicon.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+
+  <!-- GSAP sin defer -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Physician",
+    "name": "Dra. Johana Dávila",
+    "description": "Médica rural en la parroquia Santiago, cantón San Miguel de Bolívar, provincia Bolívar, Ecuador.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Parroquia Santiago",
+      "addressRegion": "San Miguel de Bolívar, Bolívar",
+      "addressCountry": "EC"
+    },
+    "telephone": "+593989999999",
+    "sameAs": ["https://www.instagram.com/johadav99/"],
+    "medicalSpecialty": "GeneralPractice",
+    "alumniOf": {
+      "@type": "CollegeOrUniversity",
+      "name": "Universidad de las Américas",
+      "address": { "@type": "PostalAddress", "addressLocality": "Quito", "addressCountry": "EC" }
+    }
+  }
+  </script>
+</head>
+
+<body>
+
+  <!-- ECG cursor canvas — JS lo activa solo en desktop -->
+  <canvas class="ecg-canvas" id="ecgCanvas" aria-hidden="true"></canvas>
+
+  <!-- ══════════════════════════════
+       NAVBAR
+  ══════════════════════════════ -->
+  <header class="nav" id="nav" role="banner">
+    <div class="nav-left">
+      <span class="nav-label">Medicina General · Rural</span>
+    </div>
+    <a href="#hero" class="nav-brand" aria-label="Inicio">Dra. Dávila</a>
+    <div class="nav-right">
+      <span class="nav-label nav-year-label">Ecuador · <span id="nav-year"></span></span>
+      <a href="https://wa.me/593989999999?text=Hola%20Dra.%20Johana%2C%20quiero%20agendar%20una%20cita"
+         class="nav-cta" target="_blank" rel="noopener noreferrer">Agendar cita →</a>
+    </div>
+    <button class="nav-toggle" id="navToggle"
+            aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span class="bar bar--top"></span>
+      <span class="bar bar--bot"></span>
+    </button>
+  </header>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <button class="mobile-menu__close" id="menuClose" aria-label="Cerrar menú">✕</button>
+    <nav class="mobile-menu__nav" aria-label="Menú principal">
+      <a href="#servicios"   class="mm-link">Servicios</a>
+      <a href="#sobre"       class="mm-link">Sobre mí</a>
+      <a href="#testimonios" class="mm-link">Testimonios</a>
+      <a href="#agenda"      class="mm-link">Contacto</a>
+    </nav>
+    <a href="https://wa.me/593989999999?text=Hola%20Dra.%20Johana%2C%20quiero%20agendar%20una%20cita"
+       class="mm-cta" target="_blank" rel="noopener noreferrer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.656 1.438 5.168L2 22l4.932-1.428A9.955 9.955 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a7.946 7.946 0 0 1-4.065-1.115l-.29-.173-3.007.87.846-3.108-.19-.309A7.96 7.96 0 0 1 4 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8z"/>
+      </svg>
+      Agendar por WhatsApp
+    </a>
+  </div>
+
+  <!-- ══════════════════════════════
+       HERO — Spline DNA
+  ══════════════════════════════ -->
+  <section class="hero" id="hero" aria-label="Introducción">
+
+    <!-- Spline 3D embed — funciona en desktop y mobile -->
+    <div class="hero-spline" aria-hidden="true">
+      <iframe
+        src="https://my.spline.design/dnaparticles-YzeVlgcXK55wV6YBRn7rxrv6/"
+        frameborder="0"
+        width="100%"
+        height="100%"
+        title="Modelo 3D DNA partículas"
+        loading="lazy"
+        allow="autoplay"
+      ></iframe>
+    </div>
+
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <!-- Labels flotantes esquinas -->
+    <span class="hero-corner hero-corner--tl" aria-hidden="true">Atención Preventiva</span>
+    <span class="hero-corner hero-corner--tr" aria-hidden="true">Parroquia Santiago · Bolívar</span>
+    <span class="hero-corner hero-corner--bl" aria-hidden="true">Médica Rural · UDLA Quito</span>
+    <span class="hero-corner hero-corner--br" aria-hidden="true">Mención en Psiquiatría</span>
+
+    <!-- Texto principal -->
+    <div class="hero-content">
+      <div class="hero-text-wrap" aria-label="Tu Salud, Mi Compromiso.">
+        <div class="hero-line">
+          <span class="hero-word" data-word>Tú</span>
+          <span class="hero-word" data-word>Salud,</span>
+        </div>
+        <div class="hero-line hero-line--indent-1">
+          <span class="hero-word" data-word>Mi</span>
+        </div>
+        <div class="hero-line hero-line--indent-2">
+          <span class="hero-word" data-word>Compromiso.</span>
+        </div>
+      </div>
+      <p class="hero-sub">Dra. Johana Dávila · Medicina General &amp; Preventiva</p>
+    </div>
+
+    <div class="hero-scroll-cue" aria-hidden="true">
+      <div class="scroll-line"></div>
+      <span>scroll</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       MARQUEE — velocidad fija
+  ══════════════════════════════ -->
+  <div class="marquee-wrap" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Consulta General</span><span class="dot">·</span>
+      <span>Medicina Preventiva</span><span class="dot">·</span>
+      <span>Salud Mental</span><span class="dot">·</span>
+      <span>Consejería Nutricional</span><span class="dot">·</span>
+      <span>Chequeos Integrales</span><span class="dot">·</span>
+      <span>Atención Rural</span><span class="dot">·</span>
+      <span>Parroquia Santiago</span><span class="dot">·</span>
+      <span>Consulta General</span><span class="dot">·</span>
+      <span>Medicina Preventiva</span><span class="dot">·</span>
+      <span>Salud Mental</span><span class="dot">·</span>
+      <span>Consejería Nutricional</span><span class="dot">·</span>
+      <span>Chequeos Integrales</span><span class="dot">·</span>
+      <span>Atención Rural</span><span class="dot">·</span>
+      <span>Parroquia Santiago</span><span class="dot">·</span>
+    </div>
+  </div>
+
+  <main id="main">
+
+    <!-- ══════════════════════════════
+         STATS
+    ══════════════════════════════ -->
+    <section class="stats-section" id="stats" aria-label="Estadísticas">
+      <div class="stats-grid">
+        <div class="stat-item" data-stat>
+          <p class="stat-number-wrap">
+            <span class="stat-number" data-count="2">0</span><span class="stat-unit">+</span>
+          </p>
+          <p class="stat-label">Años de experiencia</p>
+        </div>
+        <div class="stat-item" data-stat>
+          <p class="stat-number-wrap">
+            <span class="stat-number" data-count="200">0</span><span class="stat-unit">+</span>
+          </p>
+          <p class="stat-label">Pacientes atendidos</p>
+        </div>
+        <div class="stat-item" data-stat>
+          <p class="stat-number-wrap">
+            <span class="stat-number" data-count="6">0</span>
+          </p>
+          <p class="stat-label">Áreas de atención</p>
+        </div>
+        <div class="stat-item" data-stat>
+          <p class="stat-number-wrap">
+            <span class="stat-number" data-count="98">0</span><span class="stat-unit">%</span>
+          </p>
+          <p class="stat-label">Satisfacción del paciente</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════
+         ABOUT
+    ══════════════════════════════ -->
+    <section class="about-section" id="sobre" aria-labelledby="about-title">
+      <div class="about-grid">
+        <div class="about-photo-col" data-about-photo>
+          <div class="about-photo-frame">
+            <img src="assets/doctor.jpg"
+                 alt="Dra. Johana Dávila, Médica Rural"
+                 class="about-photo" width="480" height="640"
+                 onerror="this.style.display='none';document.getElementById('photoPlaceholder').style.display='flex'" />
+            <div class="about-photo-placeholder" id="photoPlaceholder">
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.7" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span>Foto próximamente</span>
+            </div>
+            <div class="about-photo-tag" aria-hidden="true">Dra. Johana Dávila · MG</div>
+          </div>
+          <a href="https://www.instagram.com/johadav99/"
+             target="_blank" rel="noopener noreferrer" class="ig-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="18" cy="6" r="1" fill="currentColor" stroke="none"/>
+            </svg>
+            @johadav99
+          </a>
+        </div>
+
+        <div class="about-text-col" data-about-text>
+          <p class="about-tag">Sobre mí</p>
+          <h2 class="about-title" id="about-title">
+            Medicina con vocación,<br/>humanidad y visión global.
+          </h2>
+          <p class="about-body">
+            Soy Johana Dávila, médica rural ejerciendo en la
+            <strong>parroquia Santiago</strong>, cantón San Miguel de Bolívar.
+            Me gradué en la <strong>Universidad de las Américas (UDLA)</strong>
+            en Quito con la convicción de que la atención de calidad
+            no debe ser privilegio de las grandes ciudades.
+          </p>
+          <p class="about-body">
+            Mi camino apunta hacia la <strong>Psiquiatría</strong> —
+            porque la salud mental y la física son inseparables.
+            Cada paciente llega con una historia completa,
+            y así los atiendo: sin prisa, sin juicios, con presencia real.
+          </p>
+          <ul class="about-credentials" aria-label="Credenciales">
+            <li class="credential">
+              <span class="credential-icon" aria-hidden="true">✦</span>
+              Médica General · UDLA, Quito
+            </li>
+            <li class="credential">
+              <span class="credential-icon" aria-hidden="true">✦</span>
+              Médica Rural · Parroquia Santiago, Bolívar
+            </li>
+            <li class="credential">
+              <span class="credential-icon" aria-hidden="true">✦</span>
+              Formación orientada en Psiquiatría
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════
+         SERVICES — Awards fullwidth
+         Cada servicio es una fila que
+         alterna dirección con número
+         gigante y clip-path reveal
+    ══════════════════════════════ -->
+    <section class="services-section" id="servicios" aria-labelledby="services-title">
+
+      <div class="services-header">
+        <p class="services-tag">Servicios</p>
+        <h2 class="services-title" id="services-title">Lo que ofrezco</h2>
+      </div>
+
+      <!-- Fila 01 -->
+      <div class="srow" data-srow>
+        <div class="srow__num" aria-hidden="true">01</div>
+        <div class="srow__content">
+          <div class="srow__icon" aria-hidden="true">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8">
+              <path d="M6 3v5a4 4 0 0 0 8 0V3"/><circle cx="18" cy="14" r="2.5"/>
+              <path d="M18 16.5V18a4 4 0 0 1-4 4h-2"/>
+            </svg>
+          </div>
+          <div class="srow__text">
+            <h3 class="srow__title">Consulta Médica General</h3>
+            <p class="srow__desc">Diagnóstico completo, atención de síntomas agudos y revisión del estado de salud con enfoque personalizado y cercano.</p>
+          </div>
+        </div>
+        <a href="https://wa.me/593989999999?text=Hola%20Dra.%20Johana%2C%20quiero%20una%20consulta%20general"
+           target="_blank" rel="noopener noreferrer" class="srow__cta">
+          <span>Agendar</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Fila 02 -->
+      <div class="srow" data-srow>
+        <div class="srow__num" aria-hidden="true">02</div>
+        <div class="srow__content">
+          <div class="srow__icon" aria-hidden="true">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <div class="srow__text">
+            <h3 class="srow__title">Medicina Preventiva</h3>
+            <p class="srow__desc">Chequeos periódicos, vacunación y estrategias personalizadas para prevenir enfermedades antes de que aparezcan.</p>
+          </div>
+        </div>
+        <a href="https://wa.me/593989999999?text=Hola%20Dra.%20Johana%2C%20quiero%20un%20chequeo%20preventivo"
+           target="_blank" rel="noopener noreferrer" class="srow__cta">
+          <span>Agendar</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Fila 03 -->
+      <div class="srow" data-srow>
+        <div class="srow__num" aria-hidden="true">03</div>
+        <div class="srow__content">
+          <div class="srow__icon" aria-hidden="true">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8">
+              <path d="M3 12h4l3-9 4 18 3-9h4"/>
+            </svg>
+          </div>
+          <div class="srow__text">
+            <h3 class="srow__title">Salud Mental</h3>
+            <p class="srow__desc">Primera escucha, orientación psiquiátrica y referencia especializada. La mente también necesita atención médica de calidad.</p>
+          </div>
+        </div>
+        <a href="https://wa.me/593989999999?text=Hola%20Dra.%20Johana%2C%20quisiera%20hablar%20sobre%20salud%20mental"
+           target="_blank" rel="noopener noreferrer" class="srow__cta">
+          <span>Agendar</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Fila 04 -->
+      <div class="srow" data-srow>
+        <div class="srow__num" aria-hidden="true">04</div>
+        <div class="srow__content">
+          <div class="srow__icon" aria-hidden="true">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </div>
+          <div class="srow__text">
+            <h3 class="srow__title">Manejo de Crónicos</h3>
+            <p class="srow__desc">Seguimiento de diabetes, hipertensión, hipotiroidismo y más, con planes de tratamiento adaptativos y continuos.</p>
+          </div>
+        </div>
+        <a href="https://wa.me/593989999999?text=Hola%20Dra.%20Johana%2C%20necesito%20seguimiento%20de%20enfermedad%20cr%C3%B3nica"
+           target="_blank" rel="noopener noreferrer" class="srow__cta">
+          <span>Agendar</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Fila 05 -->
+      <div class="srow" data-srow>
+        <div class="srow__num" aria-hidden="true">05</div>
+        <div class="srow__content">
+          <div class="srow__icon" aria-hidden="true">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+              <line x1="6" y1="1" x2="6" y2="4"/>
+              <line x1="10" y1="1" x2="10" y2="4"/>
+              <line x1="14" y1="1" x2="14" y2="4"/>
+            </svg>
+          </div>
+          <div class="srow__text">
+            <h3 class="srow__title">Consejería Nutricional</h3>
+            <p class="srow__desc">Planes alimenticios según tu condición y objetivos de salud. Nutrición como medicina, no como restricción.</p>
+          </div>
+        </div>
+        <a href="https://wa.me/593989999999?text=Hola%20Dra.%20Johana%2C%20quiero%20consejer%C3%ADa%20nutricional"
+           target="_blank" rel="noopener noreferrer" class="srow__cta">
+          <span>Agendar</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Fila 06 -->
+      <div class="srow" data-srow>
+        <div class="srow__num" aria-hidden="true">06</div>
+        <div class="srow__content">
+          <div class="srow__icon" aria-hidden="true">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="srow__text">
+            <h3 class="srow__title">Atención Familiar</h3>
+            <p class="srow__desc">Un médico de confianza para toda la familia: niños, adultos y adultos mayores bajo el mismo techo.</p>
+          </div>
+        </div>
+        <a href="https://wa.me/593989999999?text=Hola%20Dra.%20Johana%2C%20quiero%20atenci%C3%B3n%20familiar"
+           target="_blank" rel="noopener noreferrer" class="srow__cta">
+          <span>Agendar</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+    </section>
+
+    <!-- ══════════════════════════════
+         TESTIMONIOS
+    ══════════════════════════════ -->
+    <section class="testimonials-section" id="testimonios" aria-labelledby="testimonials-title">
+      <div class="testimonials-inner">
+        <p class="testimonials-tag">Testimonios</p>
+        <h2 class="sr-only" id="testimonials-title">Lo que dicen mis pacientes</h2>
+        <div class="testimonials-track" id="testimonialsTrack" aria-live="polite">
+          <blockquote class="testimonial active">
+            <p class="testimonial-quote">«La Dra. Johana no solo me dio un diagnóstico — me explicó todo con paciencia y claridad. Por primera vez entendí mi propia salud.»</p>
+            <cite class="testimonial-cite">— María L., paciente desde 2023</cite>
+          </blockquote>
+          <blockquote class="testimonial">
+            <p class="testimonial-quote">«Llevo a toda mi familia con ella. Tiene un don especial para que cada paciente se sienta escuchado y en confianza total.»</p>
+            <cite class="testimonial-cite">— Roberto C., padre de familia</cite>
+          </blockquote>
+          <blockquote class="testimonial">
+            <p class="testimonial-quote">«Su enfoque va más allá del cuerpo — también considera el estado emocional. En la parroquia Santiago es una bendición tenerla.»</p>
+            <cite class="testimonial-cite">— Carmen S., comunidad Santiago</cite>
+          </blockquote>
+        </div>
+        <div class="testimonials-dots" id="testimonialsDots" role="tablist" aria-label="Testimonios">
+          <button class="t-dot active" data-idx="0" role="tab" aria-selected="true"  aria-label="Testimonio 1"></button>
+          <button class="t-dot"        data-idx="1" role="tab" aria-selected="false" aria-label="Testimonio 2"></button>
+          <button class="t-dot"        data-idx="2" role="tab" aria-selected="false" aria-label="Testimonio 3"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════
+         CTA — imagen de fondo
+    ══════════════════════════════ -->
+    <section class="cta-section" id="agenda" aria-labelledby="cta-title">
+      <!-- Imagen de fondo con parallax -->
+      <div class="cta-bg" aria-hidden="true">
+        <img src="https://images.unsplash.com/photo-1551076805-e1869033e561?w=1600&q=80&auto=format&fit=crop"
+             alt="" class="cta-bg-img" />
+        <div class="cta-bg-overlay"></div>
+      </div>
+
+      <div class="cta-inner">
+        <p class="cta-eyebrow">Agenda tu cita</p>
+        <h2 class="cta-title" id="cta-title">
+          El primer paso hacia tu mejor salud empieza hoy.
+        </h2>
+        <p class="cta-sub">
+          Lunes a Viernes · 09:00 – 18:00<br/>
+          Parroquia Santiago · San Miguel de Bolívar
+        </p>
+        <div class="cta-actions">
+          <a href="https://wa.me/593989999999?text=Hola%20Dra.%20Johana%2C%20quiero%20agendar%20una%20cita"
+             class="cta-btn-primary" target="_blank" rel="noopener noreferrer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.656 1.438 5.168L2 22l4.932-1.428A9.955 9.955 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a7.946 7.946 0 0 1-4.065-1.115l-.29-.173-3.007.87.846-3.108-.19-.309A7.96 7.96 0 0 1 4 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8z"/>
+            </svg>
+            Escribir al WhatsApp
+          </a>
+          <a href="tel:+593989999999" class="cta-btn-secondary">Llamar ahora</a>
+        </div>
+        <p class="cta-note">Emergencias leves: disponible en horario de consulta</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ══════════════════════════════
+       FOOTER REVEAL
+       position:fixed debajo del main
+       main tiene padding-bottom = footer height
+  ══════════════════════════════ -->
+  <footer class="footer" id="footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span class="footer-brand">Dra. Johana Dávila</span>
+        <span class="footer-tagline">Medicina General · Parroquia Santiago · Bolívar, Ecuador</span>
+      </div>
+      <nav class="footer-center" aria-label="Footer">
+        <a href="https://www.instagram.com/johadav99/" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="#servicios">Servicios</a>
+        <a href="#sobre">Sobre mí</a>
+        <a href="#agenda">Contacto</a>
+      </nav>
+      <div class="footer-right">
+        <a href="https://andinawebstudio.com" target="_blank" rel="noopener noreferrer" class="footer-credit">
+          Andina Web Studio
+        </a>
+      </div>
+    </div>
+    <p class="footer-bottom">
+      © <span id="footer-year"></span> Dra. Johana Dávila · Todos los derechos reservados
+    </p>
+  </footer>
+
+  <!-- WhatsApp flotante -->
+  <a href="https://wa.me/593989999999?text=Hola%20Dra.%20Johana%2C%20quiero%20agendar%20una%20cita"
+     class="whatsapp-float" target="_blank" rel="noopener noreferrer"
+     aria-label="Agendar cita por WhatsApp">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.656 1.438 5.168L2 22l4.932-1.428A9.955 9.955 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a7.946 7.946 0 0 1-4.065-1.115l-.29-.173-3.007.87.846-3.108-.19-.309A7.96 7.96 0 0 1 4 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8z"/>
+    </svg>
+  </a>
+
+  <style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}</style>
+  <script src="script.js"></script>
+</body>
+</html>
