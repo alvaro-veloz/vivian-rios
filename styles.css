@@ -249,7 +249,7 @@ button { font: inherit; border: none; background: none; padding: 0; }
   font-size: clamp(80px, 13.5vw, 175px);
   letter-spacing: -0.01em;
   color: white;
-  text-shadow: 0 4px 40px rgba(0,0,0,0.4);
+
   opacity: 0;
   transform: translateY(110%);
   will-change: transform, opacity;
