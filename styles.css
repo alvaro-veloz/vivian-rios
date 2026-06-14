@@ -1134,3 +1134,8 @@ button { font: inherit; border: none; background: none; padding: 0; }
     padding: 14px 18px;
   }
 }
+
+/* Fix: foto doctora centrada en la cara, no en el centro */
+.about-photo {
+  object-position: center 15%;
+}
