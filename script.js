@@ -1,5 +1,5 @@
 /* =====================================================
-   Dra. Johana Dávila — Script principal
+   Dra. Vivian Ríos Gómez — Script principal
    ECG Cursor + GSAP Awards + Footer Reveal
    Andina Web Studio
    ===================================================== */
@@ -418,5 +418,282 @@ document.getElementById('footer-year').textContent = yr;
         gsap.to(num, { y: 6, opacity: 0.08, duration: 0.4, ease: 'power2.in' });
       }
     });
+  });
+})();
+
+/* ════════════════════════════════════════
+   GALLERY — clip-path reveal + drag scroll
+   + progress bar
+════════════════════════════════════════ */
+(function galleryInit() {
+  const strip = document.getElementById('galleryStrip');
+  const bar   = document.getElementById('galleryProgress');
+
+  /* Progress bar */
+  if (strip && bar) {
+    strip.addEventListener('scroll', () => {
+      const max = strip.scrollWidth - strip.clientWidth;
+      bar.style.width = max > 0 ? (strip.scrollLeft / max * 100) + '%' : '0%';
+    }, { passive: true });
+  }
+
+  /* Drag to scroll — desktop */
+  if (strip && !isTouch()) {
+    let down = false, startX, scrollLeft;
+    strip.addEventListener('mousedown', e => {
+      down = true;
+      startX     = e.pageX - strip.offsetLeft;
+      scrollLeft = strip.scrollLeft;
+      strip.style.cursor = 'grabbing';
+    });
+    document.addEventListener('mouseup', () => {
+      down = false;
+      strip.style.cursor = 'grab';
+    });
+    strip.addEventListener('mousemove', e => {
+      if (!down) return;
+      e.preventDefault();
+      strip.scrollLeft = scrollLeft - (e.pageX - strip.offsetLeft - startX) * 1.4;
+    });
+  }
+
+  /* GSAP reveal — items entran con clip-path desde la derecha */
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+  /* Título galería */
+  gsap.to('.gallery-title', {
+    scrollTrigger: { trigger: '.gallery-section', start: 'top 78%' },
+    clipPath: 'inset(0 0% 0 0)',
+    duration: 1.2,
+    ease: 'power4.inOut',
+  });
+  gsap.from('.gallery-tag', {
+    scrollTrigger: { trigger: '.gallery-section', start: 'top 80%' },
+    y: 20, opacity: 0, duration: 0.7, ease: 'power3.out',
+  });
+
+  /* Items del strip — entran uno por uno */
+  if (!isTouch()) {
+    gsap.to('[data-gitem]', {
+      scrollTrigger: {
+        trigger: '.gallery-strip',
+        start: 'top 82%',
+      },
+      clipPath: 'inset(0 0% 0 0)',
+      opacity: 1,
+      duration: 0.85,
+      ease: 'power3.out',
+      stagger: 0.12,
+    });
+  } else {
+    /* Mobile — visibles de inmediato */
+    document.querySelectorAll('[data-gitem]').forEach(el => {
+      el.style.opacity   = '1';
+      el.style.clipPath  = 'inset(0 0% 0 0)';
+    });
+  }
+})();
+
+/* ════════════════════════════════════════
+   CTA NUEVO — animaciones mesh + contactos
+════════════════════════════════════════ */
+(function ctaAnimations() {
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+  gsap.to('.cta-eyebrow', {
+    scrollTrigger: { trigger: '.cta-section', start: 'top 78%' },
+    y: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
+  });
+  gsap.to('.cta-title', {
+    scrollTrigger: { trigger: '.cta-section', start: 'top 75%' },
+    y: 0, opacity: 1, duration: 1.0, ease: 'power4.out', delay: 0.1,
+  });
+  gsap.to('.cta-sub', {
+    scrollTrigger: { trigger: '.cta-section', start: 'top 72%' },
+    y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.2,
+  });
+  gsap.to('.cta-contacts', {
+    scrollTrigger: { trigger: '.cta-section', start: 'top 70%' },
+    y: 0, opacity: 1, duration: 0.9, ease: 'power3.out', delay: 0.3,
+  });
+  gsap.to('.cta-note', {
+    scrollTrigger: { trigger: '.cta-section', start: 'top 65%' },
+    opacity: 1, duration: 0.6, ease: 'power2.out', delay: 0.5,
+  });
+
+  /* Cards de contacto entran en cascada */
+  gsap.from('.cta-contact-item', {
+    scrollTrigger: { trigger: '.cta-contacts', start: 'top 80%' },
+    y: 30, opacity: 0, duration: 0.7, ease: 'power3.out', stagger: 0.08,
+  });
+})();
+
+/* ════════════════════════════════════════
+   CURSOR MAGNÉTICO — contact cards
+════════════════════════════════════════ */
+(function magneticContacts() {
+  if (isTouch()) return;
+  document.querySelectorAll('.cta-contact-item').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r  = card.getBoundingClientRect();
+      const dx = (e.clientX - (r.left + r.width  / 2)) * 0.15;
+      const dy = (e.clientY - (r.top  + r.height / 2)) * 0.15;
+      card.style.transform  = `translate(${dx}px, ${dy}px) translateY(-4px)`;
+      card.style.transition = 'transform 0.1s linear';
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform  = '';
+      card.style.transition = 'transform 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+    });
+  });
+})();
+
+/* ════════════════════════════════════════
+   UPDATE — comentario del archivo
+════════════════════════════════════════ */
+// Dra. Vivian Ríos Gómez — Coroneo, Guanajuato, México
+// Andina Web Studio
+
+/* ════════════════════════════════════════
+   LIGHTBOX — foto de la doctora
+   Click → abre en pantalla completa
+   con animación spring jugona
+════════════════════════════════════════ */
+(function doctorLightbox() {
+  const photo = document.querySelector('.about-photo');
+  if (!photo) return;
+
+  /* Crear lightbox en el DOM */
+  const lb = document.createElement('div');
+  lb.className = 'lb-overlay';
+  lb.setAttribute('role', 'dialog');
+  lb.setAttribute('aria-modal', 'true');
+  lb.setAttribute('aria-label', 'Foto de la Dra. Vivian Ríos');
+  lb.innerHTML = `
+    <div class="lb-backdrop"></div>
+    <div class="lb-box">
+      <img class="lb-img" src="" alt="Dra. Vivian Ríos Gómez" />
+      <button class="lb-close" aria-label="Cerrar">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  `;
+  document.body.appendChild(lb);
+
+  const lbImg   = lb.querySelector('.lb-img');
+  const lbClose = lb.querySelector('.lb-close');
+  const lbBox   = lb.querySelector('.lb-box');
+
+  /* Estilos inline para no tocar el CSS */
+  Object.assign(lb.style, {
+    position:       'fixed',
+    inset:          '0',
+    zIndex:         '9000',
+    display:        'flex',
+    alignItems:     'center',
+    justifyContent: 'center',
+    opacity:        '0',
+    pointerEvents:  'none',
+    transition:     'opacity 0.35s ease',
+  });
+
+  const backdrop = lb.querySelector('.lb-backdrop');
+  Object.assign(backdrop.style, {
+    position:   'absolute',
+    inset:      '0',
+    background: 'rgba(6,9,16,0.92)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+  });
+
+  Object.assign(lbBox.style, {
+    position:      'relative',
+    zIndex:        '1',
+    maxWidth:      'min(520px, 90vw)',
+    maxHeight:     '90vh',
+    borderRadius:  '20px',
+    overflow:      'hidden',
+    transform:     'scale(0.75) translateY(40px)',
+    transition:    'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)',
+    boxShadow:     '0 40px 100px rgba(0,0,0,0.6)',
+  });
+
+  Object.assign(lbImg.style, {
+    width:      '100%',
+    height:     '100%',
+    objectFit:  'cover',
+    display:    'block',
+  });
+
+  Object.assign(lbClose.style, {
+    position:        'absolute',
+    top:             '14px',
+    right:           '14px',
+    width:           '40px',
+    height:          '40px',
+    borderRadius:    '50%',
+    background:      'rgba(255,255,255,0.15)',
+    backdropFilter:  'blur(8px)',
+    border:          'none',
+    color:           'white',
+    display:         'flex',
+    alignItems:      'center',
+    justifyContent:  'center',
+    cursor:          'pointer',
+    transition:      'background 0.2s, transform 0.2s',
+    zIndex:          '2',
+  });
+
+  /* Hacer la foto del about clickeable */
+  photo.style.cursor  = 'zoom-in';
+  photo.style.transition = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+  photo.addEventListener('mouseenter', () => {
+    photo.style.transform = 'scale(1.03)';
+  });
+  photo.addEventListener('mouseleave', () => {
+    photo.style.transform = '';
+  });
+
+  function openLb() {
+    lbImg.src = photo.src || photo.currentSrc || 'assets/doctor.jpg';
+    lb.style.opacity      = '0';
+    lb.style.pointerEvents = 'auto';
+    lbBox.style.transform  = 'scale(0.75) translateY(40px)';
+
+    /* Forzar reflow */
+    lb.offsetHeight;
+
+    lb.style.opacity      = '1';
+    lbBox.style.transform = 'scale(1) translateY(0)';
+    document.body.style.overflow = 'hidden';
+
+    /* Focus para accesibilidad */
+    setTimeout(() => lbClose.focus(), 100);
+  }
+
+  function closeLb() {
+    lb.style.opacity      = '0';
+    lbBox.style.transform = 'scale(0.85) translateY(20px)';
+    document.body.style.overflow = '';
+    setTimeout(() => { lb.style.pointerEvents = 'none'; }, 350);
+  }
+
+  photo.addEventListener('click', openLb);
+  lbClose.addEventListener('click', closeLb);
+  backdrop.addEventListener('click', closeLb);
+
+  lbClose.addEventListener('mouseenter', () => {
+    lbClose.style.background  = 'rgba(255,255,255,0.28)';
+    lbClose.style.transform   = 'rotate(90deg)';
+  });
+  lbClose.addEventListener('mouseleave', () => {
+    lbClose.style.background  = 'rgba(255,255,255,0.15)';
+    lbClose.style.transform   = '';
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && lb.style.pointerEvents !== 'none') closeLb();
   });
 })();
