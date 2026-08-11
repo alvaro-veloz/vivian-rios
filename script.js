@@ -43,102 +43,6 @@ document.getElementById('footer-year').textContent = yr;
 })();
 
 /* ════════════════════════════════════════
-   ECG CURSOR — solo desktop
-   Trail con fade por life, spike QRS
-   mix-blend-mode difference — visible
-   en fondos claros y oscuros
-════════════════════════════════════════ */
-(function ecgCursor() {
-  if (isTouch()) return;
-
-  const canvas = document.getElementById('ecgCanvas');
-  if (!canvas) return;
-  canvas.style.display = 'block';
-
-  const ctx = canvas.getContext('2d');
-  let W, H;
-
-  function resize() {
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize, { passive: true });
-
-  const TRAIL = 50;
-  const pts   = [];
-  let mx = -999, my = -999;
-
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX;
-    my = e.clientY;
-    pts.push({ x: mx, y: my, life: 1.0 });
-    if (pts.length > TRAIL) pts.shift();
-  });
-
-  function draw() {
-    requestAnimationFrame(draw);
-    ctx.clearRect(0, 0, W, H);
-    if (pts.length < 2) return;
-
-    /* Reducir life de cada punto */
-    pts.forEach(p => { p.life = Math.max(0, p.life - 0.024); });
-
-    ctx.globalCompositeOperation = 'difference';
-
-    for (let i = 1; i < pts.length; i++) {
-      const p0 = pts[i - 1];
-      const p1 = pts[i];
-      if (p0.life <= 0 || p1.life <= 0) continue;
-
-      const alpha = p1.life * 0.78;
-      const lw    = p1.life * 1.9;
-      const isMid = (i === Math.floor(pts.length * 0.68));
-
-      ctx.beginPath();
-      ctx.moveTo(p0.x, p0.y);
-
-      if (isMid) {
-        /* Spike QRS */
-        const cx2 = (p0.x + p1.x) / 2;
-        const cy2 = (p0.y + p1.y) / 2;
-        ctx.lineTo(cx2, cy2 - 22);
-        ctx.lineTo(cx2 + 5, cy2 + 12);
-        ctx.lineTo(p1.x, p1.y);
-      } else {
-        ctx.lineTo(p1.x, p1.y);
-      }
-
-      ctx.strokeStyle = `rgba(193,127,89,${alpha})`;
-      ctx.lineWidth   = lw;
-      ctx.lineCap     = 'round';
-      ctx.lineJoin    = 'round';
-      ctx.stroke();
-    }
-
-    /* Punto cabeza */
-    if (mx > 0 && pts.length > 0) {
-      const last = pts[pts.length - 1];
-      if (last.life > 0) {
-        ctx.beginPath();
-        ctx.arc(last.x, last.y, 4, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(248,245,240,${last.life * 0.92})`;
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(last.x, last.y, 10, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(193,127,89,${last.life * 0.5})`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-    }
-
-    ctx.globalCompositeOperation = 'source-over';
-  }
-  draw();
-})();
-
-/* ════════════════════════════════════════
    NAVBAR — ocultar al bajar
 ════════════════════════════════════════ */
 (function navbar() {
@@ -549,151 +453,99 @@ document.getElementById('footer-year').textContent = yr;
 })();
 
 /* ════════════════════════════════════════
-   UPDATE — comentario del archivo
+   CROSSFADE — dos fotos de la doctora
+   Transición ambiental automática, no
+   es un carrusel (sin flechas ni dots)
 ════════════════════════════════════════ */
-// Dra. Vivian Ríos Gómez — Coroneo, Guanajuato, México
-// Andina Web Studio
+(function photoCrossfade() {
+  const frame  = document.getElementById('aboutPhotoFrame');
+  const photos = frame ? frame.querySelectorAll('.about-photo') : [];
+  if (photos.length < 2) return;
+
+  let cur = 0;
+  let timer;
+
+  function next() {
+    const upcoming = (cur + 1) % photos.length;
+    photos[upcoming].style.transform = 'scale(1.04)';
+    photos[cur].classList.remove('is-active');
+    photos[upcoming].classList.add('is-active');
+    cur = upcoming;
+  }
+
+  function start() {
+    stop();
+    timer = setInterval(next, 4000);
+  }
+  function stop() { clearInterval(timer); }
+
+  /* Solo corre cuando la sección está visible, para no gastar ciclos de más */
+  const section = document.getElementById('sobre');
+  if (section && window.IntersectionObserver) {
+    new IntersectionObserver(entries => {
+      entries[0].isIntersecting ? start() : stop();
+    }, { threshold: 0.25 }).observe(section);
+  } else {
+    start();
+  }
+})();
 
 /* ════════════════════════════════════════
-   LIGHTBOX — foto de la doctora
-   Click → abre en pantalla completa
-   con animación spring jugona
+   VIDEOS — sin controles nativos, solo
+   ícono de audio. En desktop arrancan
+   solos (mudos) al entrar en pantalla.
+   En mobile: mazo de cartas, se abren
+   y arrancan al hacer tap.
 ════════════════════════════════════════ */
-(function doctorLightbox() {
-  const photo = document.querySelector('.about-photo');
-  if (!photo) return;
+(function videoDeck() {
+  const grid    = document.getElementById('videosGrid');
+  const trigger = document.getElementById('videosDeckTrigger');
+  const section = document.getElementById('videos');
+  if (!grid || !trigger) return;
 
-  /* Crear lightbox en el DOM */
-  const lb = document.createElement('div');
-  lb.className = 'lb-overlay';
-  lb.setAttribute('role', 'dialog');
-  lb.setAttribute('aria-modal', 'true');
-  lb.setAttribute('aria-label', 'Foto de la Dra. Vivian Ríos');
-  lb.innerHTML = `
-    <div class="lb-backdrop"></div>
-    <div class="lb-box">
-      <img class="lb-img" src="" alt="Dra. Vivian Ríos Gómez" />
-      <button class="lb-close" aria-label="Cerrar">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M18 6L6 18M6 6l12 12"/>
-        </svg>
-      </button>
-    </div>
-  `;
-  document.body.appendChild(lb);
+  const cards  = grid.querySelectorAll('[data-video-card]');
+  const videos = grid.querySelectorAll('.video-el');
+  const mq     = window.matchMedia('(max-width: 600px)');
 
-  const lbImg   = lb.querySelector('.lb-img');
-  const lbClose = lb.querySelector('.lb-close');
-  const lbBox   = lb.querySelector('.lb-box');
+  /* Silenciados por defecto: evita reproducción con audio automática */
+  videos.forEach(v => { v.muted = true; v.removeAttribute('controls'); });
 
-  /* Estilos inline para no tocar el CSS */
-  Object.assign(lb.style, {
-    position:       'fixed',
-    inset:          '0',
-    zIndex:         '9000',
-    display:        'flex',
-    alignItems:     'center',
-    justifyContent: 'center',
-    opacity:        '0',
-    pointerEvents:  'none',
-    transition:     'opacity 0.35s ease',
-  });
-
-  const backdrop = lb.querySelector('.lb-backdrop');
-  Object.assign(backdrop.style, {
-    position:   'absolute',
-    inset:      '0',
-    background: 'rgba(6,9,16,0.92)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
-  });
-
-  Object.assign(lbBox.style, {
-    position:      'relative',
-    zIndex:        '1',
-    maxWidth:      'min(520px, 90vw)',
-    maxHeight:     '90vh',
-    borderRadius:  '20px',
-    overflow:      'hidden',
-    transform:     'scale(0.75) translateY(40px)',
-    transition:    'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)',
-    boxShadow:     '0 40px 100px rgba(0,0,0,0.6)',
-  });
-
-  Object.assign(lbImg.style, {
-    width:      '100%',
-    height:     '100%',
-    objectFit:  'cover',
-    display:    'block',
-  });
-
-  Object.assign(lbClose.style, {
-    position:        'absolute',
-    top:             '14px',
-    right:           '14px',
-    width:           '40px',
-    height:          '40px',
-    borderRadius:    '50%',
-    background:      'rgba(255,255,255,0.15)',
-    backdropFilter:  'blur(8px)',
-    border:          'none',
-    color:           'white',
-    display:         'flex',
-    alignItems:      'center',
-    justifyContent:  'center',
-    cursor:          'pointer',
-    transition:      'background 0.2s, transform 0.2s',
-    zIndex:          '2',
-  });
-
-  /* Hacer la foto del about clickeable */
-  photo.style.cursor  = 'zoom-in';
-  photo.style.transition = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
-  photo.addEventListener('mouseenter', () => {
-    photo.style.transform = 'scale(1.03)';
-  });
-  photo.addEventListener('mouseleave', () => {
-    photo.style.transform = '';
-  });
-
-  function openLb() {
-    lbImg.src = photo.src || photo.currentSrc || 'assets/doctor.jpg';
-    lb.style.opacity      = '0';
-    lb.style.pointerEvents = 'auto';
-    lbBox.style.transform  = 'scale(0.75) translateY(40px)';
-
-    /* Forzar reflow */
-    lb.offsetHeight;
-
-    lb.style.opacity      = '1';
-    lbBox.style.transform = 'scale(1) translateY(0)';
-    document.body.style.overflow = 'hidden';
-
-    /* Focus para accesibilidad */
-    setTimeout(() => lbClose.focus(), 100);
+  /* Desktop — autoplay al entrar la sección en pantalla */
+  if (section && window.IntersectionObserver) {
+    new IntersectionObserver(entries => {
+      if (mq.matches) return; /* en mobile el video arranca al abrir el mazo */
+      if (entries[0].isIntersecting) {
+        videos.forEach(v => v.play().catch(() => {}));
+      } else {
+        videos.forEach(v => v.pause());
+      }
+    }, { threshold: 0.3 }).observe(section);
   }
 
-  function closeLb() {
-    lb.style.opacity      = '0';
-    lbBox.style.transform = 'scale(0.85) translateY(20px)';
-    document.body.style.overflow = '';
-    setTimeout(() => { lb.style.pointerEvents = 'none'; }, 350);
+  /* Mobile — mazo de cartas, arranca al abrirse */
+  function openDeck() {
+    grid.classList.add('is-open');
+    videos.forEach(v => v.play().catch(() => {}));
   }
+  trigger.addEventListener('click', openDeck);
 
-  photo.addEventListener('click', openLb);
-  lbClose.addEventListener('click', closeLb);
-  backdrop.addEventListener('click', closeLb);
+  /* Botón de mute individual por video */
+  cards.forEach(card => {
+    const video = card.querySelector('.video-el');
+    const btn   = card.querySelector('[data-mute-btn]');
+    if (!video || !btn) return;
 
-  lbClose.addEventListener('mouseenter', () => {
-    lbClose.style.background  = 'rgba(255,255,255,0.28)';
-    lbClose.style.transform   = 'rotate(90deg)';
-  });
-  lbClose.addEventListener('mouseleave', () => {
-    lbClose.style.background  = 'rgba(255,255,255,0.15)';
-    lbClose.style.transform   = '';
-  });
+    function sync() {
+      btn.classList.toggle('is-muted', video.muted);
+      btn.setAttribute('aria-label', video.muted ? 'Activar audio' : 'Silenciar');
+    }
+    sync();
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && lb.style.pointerEvents !== 'none') closeLb();
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      video.muted = !video.muted;
+      sync();
+    });
   });
 })();
+
