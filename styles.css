@@ -185,12 +185,12 @@ button { font: inherit; border: none; background: none; padding: 0; }
   border: none;
   display: block;
   /* Compensa el encuadre de la escena 3D dentro del contenedor */
-  transform: scale(3.6);
+  transform: scale(2.0);
   transform-origin: center center;
 }
 @media (max-width: 600px) {
   /* Zoom adicional para el viewport reducido */
-  .hero-spline iframe { transform: scale(3.6); }
+  .hero-spline iframe { transform: scale(2.0); }
 }
 
 /* Overlay muy sutil para que el texto se lea */
