@@ -14,6 +14,43 @@ document.getElementById('nav-year').textContent    = yr;
 document.getElementById('footer-year').textContent = yr;
 
 /* ════════════════════════════════════════
+   PRELOADER
+   Se oculta cuando el Spline del hero termina
+   de cargar, con un mínimo de ~5s en pantalla
+   y un límite máximo de seguridad por si el
+   iframe tarda demasiado o falla.
+════════════════════════════════════════ */
+(function preloader() {
+  const preloaderEl = document.getElementById('preloader');
+  const splineFrame  = document.querySelector('.hero-spline iframe');
+  if (!preloaderEl) return;
+
+  const MIN_TIME     = 5000; // tiempo mínimo visible (ms)
+  const HARD_TIMEOUT  = 9000; // red de seguridad por si el spline nunca carga
+
+  let splineReady = false;
+  let minTimeDone = false;
+
+  function tryHide() {
+    if (splineReady && minTimeDone) hidePreloader();
+  }
+
+  function hidePreloader() {
+    preloaderEl.classList.add('is-hidden');
+    preloaderEl.addEventListener('transitionend', () => preloaderEl.remove(), { once: true });
+  }
+
+  setTimeout(() => { minTimeDone = true; tryHide(); }, MIN_TIME);
+  setTimeout(hidePreloader, HARD_TIMEOUT);
+
+  if (splineFrame) {
+    splineFrame.addEventListener('load', () => { splineReady = true; tryHide(); }, { once: true });
+  } else {
+    splineReady = true;
+  }
+})();
+
+/* ════════════════════════════════════════
    FOOTER REVEAL
    Footer fijo abajo, main lo tapa.
    ResizeObserver recalcula siempre.
