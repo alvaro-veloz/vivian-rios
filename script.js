@@ -210,25 +210,9 @@ document.getElementById('footer-year').textContent = yr;
     scrollTrigger: { trigger: '.cta-section', start: 'top 72%' },
     y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.2,
   });
-  gsap.to('.cta-actions', {
-    scrollTrigger: { trigger: '.cta-section', start: 'top 70%' },
-    y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.3,
-  });
   gsap.to('.cta-note', {
     scrollTrigger: { trigger: '.cta-section', start: 'top 68%' },
     opacity: 1, duration: 0.6, ease: 'power2.out', delay: 0.45,
-  });
-
-  /* ── CTA parallax imagen de fondo ── */
-  gsap.to('.cta-bg', {
-    scrollTrigger: {
-      trigger: '.cta-section',
-      start: 'top bottom',
-      end: 'bottom top',
-      scrub: true,
-    },
-    y: '18%',
-    ease: 'none',
   });
 
   /* ── About title clip-path reveal ── */
@@ -586,3 +570,174 @@ document.getElementById('footer-year').textContent = yr;
   });
 })();
 
+/* ══════════════════════════════════════
+   BOOKING DEMO
+══════════════════════════════════════ */
+(function bookingExperience() {
+  const root = document.getElementById('bookingCard');
+  if (!root) return;
+
+  // La reserva cierra el recorrido, justo después del bloque de contacto.
+  const bookingSection = root.closest('.booking-section');
+  const contactSection = document.querySelector('.cta-section');
+  if (bookingSection && contactSection) {
+    contactSection.after(bookingSection);
+    requestAnimationFrame(() => {
+      if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+      if (window.location.hash === '#reservar') bookingSection.scrollIntoView({ block:'start' });
+    });
+  }
+
+  const panels = root.querySelectorAll('[data-panel]');
+  const steps = root.querySelectorAll('[data-booking-step]');
+  const progress = document.getElementById('bookingProgress');
+  const grid = document.getElementById('calendarGrid');
+  const monthLabel = document.getElementById('monthLabel');
+  const prev = document.getElementById('monthPrev');
+  const next = document.getElementById('monthNext');
+  const fullNote = document.getElementById('monthFullNote');
+  const timeEmpty = document.getElementById('timeEmpty');
+  const timeContent = document.getElementById('timeContent');
+  const timeDate = document.getElementById('timeDate');
+  const timeSlots = document.getElementById('timeSlots');
+  const toDetails = document.getElementById('toDetails');
+  const form = document.getElementById('bookingForm');
+  const months = [
+    new Date(2026, 8, 1), new Date(2026, 9, 1), new Date(2026, 10, 1),
+    new Date(2026, 11, 1), new Date(2027, 0, 1), new Date(2027, 1, 1)
+  ];
+  const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const dateFormatter = new Intl.DateTimeFormat('es-MX', { weekday:'long', day:'numeric', month:'long' });
+  const state = { step:1, month:3, service:'Consulta general', duration:'45 min', date:null, time:null };
+  const slotSets = [
+    ['08:00','09:30','12:00','15:30'],
+    ['08:30','11:00','14:00','17:00'],
+    ['09:00','10:30','13:30','16:30']
+  ];
+
+  function showPanel(number) {
+    state.step = number;
+    panels.forEach(panel => panel.classList.toggle('is-active', Number(panel.dataset.panel) === number));
+    steps.forEach((step, index) => {
+      const stepNumber = index + 1;
+      step.classList.toggle('is-active', stepNumber === Math.min(number, 3));
+      step.classList.toggle('is-done', stepNumber < number);
+      step.disabled = stepNumber > number;
+    });
+    progress.style.height = number === 1 ? '0%' : number === 2 ? '50%' : '100%';
+    if (number === 2) renderCalendar();
+    if (number === 3) renderSummary('bookingSummary');
+  }
+
+  root.querySelectorAll('.appointment-type').forEach(button => {
+    button.addEventListener('click', () => {
+      root.querySelectorAll('.appointment-type').forEach(item => {
+        item.classList.remove('is-selected');
+        item.setAttribute('aria-checked', 'false');
+      });
+      button.classList.add('is-selected');
+      button.setAttribute('aria-checked', 'true');
+      state.service = button.dataset.service;
+      state.duration = button.dataset.duration;
+    });
+  });
+
+  root.querySelectorAll('[data-next]').forEach(button => button.addEventListener('click', () => showPanel(Number(button.dataset.next))));
+  root.querySelectorAll('[data-back]').forEach(button => button.addEventListener('click', () => showPanel(Number(button.dataset.back))));
+  steps.forEach(step => step.addEventListener('click', () => { if (!step.disabled) showPanel(Number(step.dataset.bookingStep)); }));
+
+  function renderCalendar() {
+    const month = months[state.month];
+    const isFull = state.month < 3;
+    const days = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+    let firstWeekday = 1;
+    while ([0, 6].includes(new Date(month.getFullYear(), month.getMonth(), firstWeekday).getDay())) firstWeekday += 1;
+    const firstDay = new Date(month.getFullYear(), month.getMonth(), firstWeekday).getDay() - 1;
+    monthLabel.textContent = `${monthNames[month.getMonth()]} ${month.getFullYear()}`;
+    grid.innerHTML = '';
+    fullNote.hidden = !isFull;
+    prev.disabled = state.month === 0;
+    next.disabled = state.month === months.length - 1;
+
+    for (let i = 0; i < firstDay; i += 1) {
+      const blank = document.createElement('span');
+      blank.className = 'calendar-day is-empty';
+      grid.appendChild(blank);
+    }
+
+    for (let day = 1; day <= days; day += 1) {
+      const date = new Date(month.getFullYear(), month.getMonth(), day);
+      const weekday = date.getDay();
+      if (weekday === 0 || weekday === 6) continue;
+      const available = !isFull && ((day + month.getMonth()) % 3 !== 0);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `calendar-day${available ? ' is-available' : ''}`;
+      button.textContent = day;
+      button.disabled = !available;
+      button.setAttribute('aria-label', available ? `Seleccionar ${dateFormatter.format(date)}` : `${dateFormatter.format(date)}, no disponible`);
+      if (state.date && state.date.toDateString() === date.toDateString()) button.classList.add('is-selected');
+      if (available) button.addEventListener('click', () => selectDate(date, button));
+      grid.appendChild(button);
+    }
+
+    if (isFull || !state.date || state.date.getMonth() !== month.getMonth()) clearTime();
+  }
+
+  function selectDate(date, button) {
+    state.date = date;
+    state.time = null;
+    grid.querySelectorAll('.calendar-day').forEach(day => day.classList.remove('is-selected'));
+    button.classList.add('is-selected');
+    timeEmpty.hidden = true;
+    timeContent.hidden = false;
+    timeDate.textContent = dateFormatter.format(date);
+    timeSlots.innerHTML = '';
+    slotSets[date.getDate() % slotSets.length].forEach(slot => {
+      const slotButton = document.createElement('button');
+      slotButton.type = 'button';
+      slotButton.className = 'time-slot';
+      slotButton.textContent = slot;
+      slotButton.addEventListener('click', () => {
+        timeSlots.querySelectorAll('.time-slot').forEach(item => item.classList.remove('is-selected'));
+        slotButton.classList.add('is-selected');
+        state.time = slot;
+        toDetails.disabled = false;
+      });
+      timeSlots.appendChild(slotButton);
+    });
+    toDetails.disabled = true;
+  }
+
+  function clearTime() {
+    state.date = null;
+    state.time = null;
+    timeEmpty.hidden = false;
+    timeContent.hidden = true;
+    toDetails.disabled = true;
+  }
+
+  prev.addEventListener('click', () => { if (state.month > 0) { state.month -= 1; renderCalendar(); } });
+  next.addEventListener('click', () => { if (state.month < months.length - 1) { state.month += 1; renderCalendar(); } });
+
+  function renderSummary(id) {
+    const target = document.getElementById(id);
+    const formattedDate = state.date ? dateFormatter.format(state.date) : '';
+    target.innerHTML = `<span>${state.service}</span><span>${state.duration}</span><span>${formattedDate}</span><span>${state.time || ''} h</span>`;
+  }
+
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    renderSummary('successSummary');
+    showPanel(4);
+  });
+
+  document.getElementById('bookingRestart').addEventListener('click', () => {
+    state.month = 3; state.date = null; state.time = null;
+    form.reset();
+    showPanel(1);
+  });
+
+  renderCalendar();
+})();

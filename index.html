@@ -141,8 +141,7 @@
     <a href="#hero" class="nav-brand" aria-label="Inicio">Dra. Vivian</a>
     <div class="nav-right">
       <span class="nav-label nav-year-label">México · <span id="nav-year"></span></span>
-      <a href="https://wa.me/5214424572806?text=Hola%20Dra.%20Vivian%2C%20quiero%20agendar%20una%20cita"
-         class="nav-cta" target="_blank" rel="noopener noreferrer">Agendar cita →</a>
+      <a href="#reservar" class="nav-cta">Agendar cita →</a>
     </div>
     <button class="nav-toggle" id="navToggle"
             aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
@@ -158,6 +157,7 @@
       <a href="#servicios"   class="mm-link">Servicios</a>
       <a href="#sobre"       class="mm-link">Sobre mí</a>
       <a href="#testimonios" class="mm-link">Testimonios</a>
+      <a href="#reservar"    class="mm-link">Agendar cita</a>
       <a href="#agenda"      class="mm-link">Contacto</a>
     </nav>
     <a href="https://wa.me/5214424572806?text=Hola%20Dra.%20Vivian%2C%20quiero%20agendar%20una%20cita"
@@ -197,7 +197,7 @@
 
     <!-- Texto principal -->
     <div class="hero-content">
-      <div class="hero-text-wrap" aria-label="Salud con Alma.">
+      <h1 class="hero-text-wrap" aria-label="Salud con Alma.">
         <div class="hero-line">
           <span class="hero-word" data-word>Salud con</span>
           <span class="hero-word" data-word></span>
@@ -208,7 +208,7 @@
         <div class="hero-line hero-line--indent-2">
           
         </div>
-      </div>
+      </h1>
       <p class="hero-sub">Dra. Vivian Ríos Gómez · Medicina General &amp; Preventiva</p>
     </div>
 
@@ -276,6 +276,102 @@
             <span class="stat-number" data-count="98">0</span><span class="stat-unit">%</span>
           </p>
           <p class="stat-label">Satisfacción del paciente</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════
+         RESERVAS
+    ══════════════════════════════ -->
+    <section class="booking-section" id="reservar" aria-labelledby="booking-title">
+      <div class="booking-glow booking-glow--one" aria-hidden="true"></div>
+      <div class="booking-glow booking-glow--two" aria-hidden="true"></div>
+
+      <div class="booking-shell">
+        <header class="booking-intro">
+          <div>
+            <p class="booking-kicker"><span></span> Reserva en línea</p>
+            <h2 class="booking-title" id="booking-title">Tu consulta,<br><em>sin esperas.</em></h2>
+          </div>
+          <p class="booking-lead">Elige el motivo, encuentra un espacio disponible y deja tu cita lista en menos de un minuto.</p>
+        </header>
+
+        <div class="booking-card" id="bookingCard">
+          <div class="booking-rail" aria-label="Progreso de reserva">
+            <div class="booking-progress" aria-hidden="true"><span id="bookingProgress"></span></div>
+            <button class="booking-step is-active" type="button" data-booking-step="1"><b>01</b><span>Consulta</span></button>
+            <button class="booking-step" type="button" data-booking-step="2" disabled><b>02</b><span>Fecha</span></button>
+            <button class="booking-step" type="button" data-booking-step="3" disabled><b>03</b><span>Datos</span></button>
+            <div class="booking-secure"><span>✦</span> Confirmación privada</div>
+          </div>
+
+          <div class="booking-stage">
+            <div class="booking-panel is-active" data-panel="1">
+              <p class="booking-overline">Paso 1 de 3</p>
+              <h3>¿Cómo podemos ayudarte?</h3>
+              <p class="booking-hint">Selecciona el tipo de consulta que necesitas.</p>
+              <div class="appointment-types" role="radiogroup" aria-label="Tipo de consulta">
+                <button class="appointment-type is-selected" type="button" role="radio" aria-checked="true" data-service="Consulta general" data-duration="45 min">
+                  <span class="appointment-icon">+</span><span><strong>Consulta general</strong><small>Valoración integral · 45 min</small></span><i>01</i>
+                </button>
+                <button class="appointment-type" type="button" role="radio" aria-checked="false" data-service="Consulta preventiva" data-duration="40 min">
+                  <span class="appointment-icon">◇</span><span><strong>Consulta preventiva</strong><small>Chequeo y prevención · 40 min</small></span><i>02</i>
+                </button>
+                <button class="appointment-type" type="button" role="radio" aria-checked="false" data-service="Seguimiento" data-duration="30 min">
+                  <span class="appointment-icon">↗</span><span><strong>Seguimiento</strong><small>Revisión de tratamiento · 30 min</small></span><i>03</i>
+                </button>
+              </div>
+              <button class="booking-next" type="button" data-next="2"><span>Elegir fecha</span><b>→</b></button>
+            </div>
+
+            <div class="booking-panel" data-panel="2">
+              <div class="calendar-head">
+                <div><p class="booking-overline">Paso 2 de 3</p><h3>Elige tu momento</h3></div>
+                <div class="calendar-controls">
+                  <button type="button" id="monthPrev" aria-label="Mes anterior">←</button>
+                  <strong id="monthLabel">Diciembre 2026</strong>
+                  <button type="button" id="monthNext" aria-label="Mes siguiente">→</button>
+                </div>
+              </div>
+              <div class="calendar-layout">
+                <div class="calendar-wrap">
+                  <div class="calendar-week"><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span></div>
+                  <div class="calendar-grid" id="calendarGrid" aria-live="polite"></div>
+                </div>
+                <aside class="time-panel" id="timePanel">
+                  <div class="time-empty" id="timeEmpty"><span>◷</span><p>Selecciona un día disponible para ver los horarios.</p></div>
+                  <div class="time-content" id="timeContent" hidden>
+                    <p class="time-date" id="timeDate"></p>
+                    <div class="time-slots" id="timeSlots"></div>
+                  </div>
+                </aside>
+              </div>
+              <div class="month-full-note" id="monthFullNote" hidden><span>Agenda completa</span> Este mes ya no tiene espacios disponibles. La primera fecha libre es en diciembre.</div>
+              <div class="booking-actions"><button class="booking-back" type="button" data-back="1">← Volver</button><button class="booking-next" type="button" data-next="3" id="toDetails" disabled><span>Continuar</span><b>→</b></button></div>
+            </div>
+
+            <div class="booking-panel" data-panel="3">
+              <p class="booking-overline">Paso 3 de 3</p>
+              <h3>Últimos detalles</h3>
+              <p class="booking-hint">Completa tus datos para preparar la confirmación.</p>
+              <div class="booking-summary" id="bookingSummary"></div>
+              <form class="booking-form" id="bookingForm">
+                <label><span>Nombre completo</span><input type="text" name="name" placeholder="Escribe tu nombre" required></label>
+                <label><span>Teléfono</span><input type="tel" name="phone" placeholder="+52 000 000 0000" required></label>
+                <label class="booking-form-wide"><span>Motivo de consulta <small>(opcional)</small></span><textarea name="reason" rows="3" placeholder="Cuéntanos brevemente cómo podemos ayudarte"></textarea></label>
+                <div class="booking-actions booking-form-wide"><button class="booking-back" type="button" data-back="2">← Volver</button><button class="booking-next" type="submit"><span>Confirmar cita</span><b>✓</b></button></div>
+              </form>
+            </div>
+
+            <div class="booking-panel booking-success" data-panel="4" aria-live="polite">
+              <div class="success-mark"><span>✓</span></div>
+              <p class="booking-overline">Reserva completada</p>
+              <h3>Todo listo.</h3>
+              <p>Tu cita quedó reservada. Recibirás la confirmación y los detalles por WhatsApp.</p>
+              <div class="booking-summary" id="successSummary"></div>
+              <button class="booking-restart" type="button" id="bookingRestart">Hacer otra reserva</button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -832,7 +928,7 @@
           El primer paso hacia tu mejor salud empieza hoy.
         </h2>
         <p class="cta-sub">
-          Lunes a Viernes · 09:00 – 18:00<br/>
+          Lunes a Viernes · 08:00 – 17:00<br/>
           Coroneo, Guanajuato, México
         </p>
         <div class="cta-contacts">
