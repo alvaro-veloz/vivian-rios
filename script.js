@@ -23,6 +23,7 @@ document.getElementById('footer-year').textContent = yr;
 (function preloader() {
   const preloaderEl = document.getElementById('preloader');
   const splineFrame  = document.querySelector('.hero-spline iframe');
+  const percentEl    = document.getElementById('preloaderPercent');
   if (!preloaderEl) return;
 
   const MIN_TIME     = 5000; // tiempo mínimo visible (ms)
@@ -30,12 +31,22 @@ document.getElementById('footer-year').textContent = yr;
 
   let splineReady = false;
   let minTimeDone = false;
+  const startedAt = performance.now();
+
+  function updatePercent(now) {
+    if (!percentEl || preloaderEl.classList.contains('is-hidden')) return;
+    const progress = Math.min(Math.floor(((now - startedAt) / MIN_TIME) * 98), 98);
+    percentEl.textContent = `${String(progress).padStart(2, '0')}%`;
+    requestAnimationFrame(updatePercent);
+  }
+  requestAnimationFrame(updatePercent);
 
   function tryHide() {
     if (splineReady && minTimeDone) hidePreloader();
   }
 
   function hidePreloader() {
+    if (percentEl) percentEl.textContent = '100%';
     preloaderEl.classList.add('is-hidden');
     preloaderEl.addEventListener('transitionend', () => preloaderEl.remove(), { once: true });
   }

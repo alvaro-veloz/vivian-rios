@@ -64,12 +64,27 @@
        del hero termina de cargar (mín. ~5s)
   ══════════════════════════════ -->
   <div id="preloader" class="preloader" role="status" aria-live="polite" aria-label="Cargando sitio">
+    <div class="preloader-meta" aria-hidden="true">
+      <span>VRG · Medicina General</span>
+      <span id="preloaderPercent">00%</span>
+    </div>
+    <span class="preloader-index preloader-index--left" aria-hidden="true">CORONEO · GTO</span>
+    <span class="preloader-index preloader-index--right" aria-hidden="true">EST. MMXXIV</span>
     <div class="preloader-inner">
-      <svg class="preloader-dna" width="56" height="56" viewBox="0 0 48 48" aria-hidden="true">
-        <use href="#ic-dna" fill="currentColor"/>
-      </svg>
-      <span class="preloader-text">Dra. Vivian Ríos Gómez</span>
+      <div class="preloader-emblem" aria-hidden="true">
+        <span class="preloader-orbit preloader-orbit--outer"></span>
+        <span class="preloader-orbit preloader-orbit--inner"></span>
+        <span class="preloader-scan"></span>
+        <svg class="preloader-dna" width="70" height="70" viewBox="0 0 48 48">
+          <use href="#ic-dna" fill="currentColor"/>
+        </svg>
+      </div>
+      <div class="preloader-copy">
+        <span class="preloader-kicker">Cuidado que evoluciona</span>
+        <span class="preloader-text">Dra. Vivian Ríos Gómez</span>
+      </div>
       <div class="preloader-bar"><span class="preloader-bar__fill"></span></div>
+      <span class="preloader-status">Preparando experiencia clínica</span>
     </div>
   </div>
 
@@ -302,7 +317,7 @@
             <button class="booking-step is-active" type="button" data-booking-step="1"><b>01</b><span>Consulta</span></button>
             <button class="booking-step" type="button" data-booking-step="2" disabled><b>02</b><span>Fecha</span></button>
             <button class="booking-step" type="button" data-booking-step="3" disabled><b>03</b><span>Datos</span></button>
-            <div class="booking-secure"><span>✦</span> Confirmación privada</div>
+            <div class="booking-secure">Confirmación privada</div>
           </div>
 
           <div class="booking-stage">
