@@ -154,6 +154,46 @@ document.getElementById('footer-year').textContent = yr;
 })();
 
 /* ════════════════════════════════════════
+   HERO 3D — activación consciente
+   Mantiene el scroll libre hasta que la persona
+   decide interactuar con el Spline.
+════════════════════════════════════════ */
+(function heroInteractionMode() {
+  const hero = document.getElementById('hero');
+  const toggle = document.getElementById('heroInteractionToggle');
+  const splineWrap = hero?.querySelector('.hero-spline');
+  const frame = splineWrap?.querySelector('iframe');
+  if (!hero || !toggle || !frame) return;
+
+  const label = toggle.querySelector('.hero-interaction-toggle__label');
+
+  function setInteractive(active) {
+    hero.classList.toggle('is-interactive', active);
+    toggle.setAttribute('aria-pressed', String(active));
+    splineWrap.setAttribute('aria-hidden', String(!active));
+    frame.tabIndex = active ? 0 : -1;
+    label.textContent = active ? 'Continuar recorrido' : 'Explorar ADN';
+  }
+
+  toggle.addEventListener('click', () => {
+    setInteractive(!hero.classList.contains('is-interactive'));
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') setInteractive(false);
+  });
+
+  document.querySelector('.hero-scroll-btn')?.addEventListener('click', () => setInteractive(false));
+
+  const observer = new IntersectionObserver(entries => {
+    if (!entries[0].isIntersecting) setInteractive(false);
+  }, { threshold:.2 });
+  observer.observe(hero);
+
+  setInteractive(false);
+})();
+
+/* ════════════════════════════════════════
    GSAP ScrollTrigger — todas las secciones
 ════════════════════════════════════════ */
 (function scrollAnimations() {
