@@ -535,10 +535,20 @@
         <svg class="deco-icon deco-icon--t"><use href="#ic-ambulance"/></svg>
       </div>
 
-      <div class="services-header">
-        <p class="services-tag">Servicios</p>
-        <h2 class="services-title" id="services-title">Lo que ofrezco</h2>
-      </div>
+      <div class="services-scroll-layout">
+        <div class="services-header">
+          <div>
+            <p class="services-tag">Servicios</p>
+            <h2 class="services-title" id="services-title">Lo que ofrezco</h2>
+          </div>
+          <div class="services-scroll-status" aria-hidden="true">
+            <div class="services-scroll-count"><strong id="servicesActiveIndex">01</strong><span>/ 06</span></div>
+            <div class="services-scroll-line"><span id="servicesScrollProgress"></span></div>
+            <p>Desliza para explorar</p>
+          </div>
+        </div>
+
+        <div class="services-list">
 
       <!-- Fila 01 -->
       <div class="srow" data-srow>
@@ -684,7 +694,8 @@
           </svg>
         </a>
       </div>
-
+        </div>
+      </div>
     </section>
 
     <!-- ══════════════════════════════
@@ -799,14 +810,20 @@
          GALERÍA — Fotos del consultorio
     ══════════════════════════════ -->
     <section class="gallery-section" id="galeria" aria-labelledby="gallery-title">
+      <div class="gallery-pin">
       <div class="gallery-header">
         <div>
           <p class="gallery-tag">Consultorio</p>
           <h2 class="gallery-title" id="gallery-title">El espacio donde cuido tu salud</h2>
         </div>
+        <div class="gallery-swipe-hint" id="gallerySwipeHint" aria-hidden="true">
+          <span>Sigue deslizando</span>
+          <b>01 — 07</b>
+          <i>↓</i>
+        </div>
       </div>
 
-      <div class="gallery-strip" id="galleryStrip" role="list">
+      <div class="gallery-strip" id="galleryStrip" role="list" tabindex="0" aria-label="Galería horizontal del consultorio. Desliza para ver las siete fotografías.">
         <div class="gallery-item gallery-item--tall" data-gitem role="listitem">
           <img src="assets/consultorio-1.webp" alt="Sala de espera" loading="lazy" />
           <div class="gallery-item__overlay">
@@ -860,6 +877,7 @@
 
       <div class="gallery-progress-wrap" aria-hidden="true">
         <div class="gallery-progress" id="galleryProgress"></div>
+      </div>
       </div>
     </section>
 

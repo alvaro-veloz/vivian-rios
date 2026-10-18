@@ -278,6 +278,160 @@ document.getElementById('footer-year').textContent = yr;
 })();
 
 /* ════════════════════════════════════════
+   SCROLL NARRATIVE — movimiento reversible
+   El progreso depende del scroll: al subir,
+   cada gesto vuelve naturalmente atrás.
+════════════════════════════════════════ */
+(function scrollNarrative() {
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const mm = gsap.matchMedia();
+
+  /* Profundidad muy suave al salir del hero. */
+  gsap.to('.hero-content', {
+    yPercent: -16,
+    scale: .965,
+    opacity: .22,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '.hero',
+      start: 'top top',
+      end: 'bottom top',
+      scrub: .65,
+    },
+  });
+
+  /* La fotografía se abre como una cortina y respira en profundidad. */
+  gsap.fromTo('.about-photo-frame',
+    { clipPath: 'inset(10% 11% 10% 11% round 30px)', y: 34 },
+    {
+      clipPath: 'inset(0% 0% 0% 0% round 22px)',
+      y: -18,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.about-section',
+        start: 'top 92%',
+        end: 'bottom 24%',
+        scrub: .8,
+      },
+    }
+  );
+  gsap.fromTo('.about-photo',
+    { scale: 1.13, yPercent: -3 },
+    {
+      scale: 1.025,
+      yPercent: 3,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.about-section',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: .9,
+      },
+    }
+  );
+
+  /* Escena editorial fija: el contador sigue el servicio visible. */
+  const rows = gsap.utils.toArray('[data-srow]');
+  const activeIndex = document.getElementById('servicesActiveIndex');
+  const progress = document.getElementById('servicesScrollProgress');
+
+  function setActiveService(index) {
+    rows.forEach((row, rowIndex) => row.classList.toggle('is-scroll-active', rowIndex === index));
+    if (activeIndex) activeIndex.textContent = String(index + 1).padStart(2, '0');
+  }
+
+  rows.forEach((row, index) => {
+    const content = row.querySelector('.srow__content');
+    const number = row.querySelector('.srow__num');
+
+    if (content) {
+      gsap.fromTo(content,
+        { x: 28, opacity: .42 },
+        {
+          x: 0,
+          opacity: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: row,
+            start: 'top 94%',
+            end: 'center 56%',
+            scrub: .65,
+          },
+        }
+      );
+    }
+    if (number) {
+      gsap.fromTo(number,
+        { y: 22 },
+        {
+          y: -8,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: row,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: .8,
+          },
+        }
+      );
+    }
+
+    ScrollTrigger.create({
+      trigger: row,
+      start: 'top 58%',
+      end: 'bottom 42%',
+      onEnter: () => setActiveService(index),
+      onEnterBack: () => setActiveService(index),
+    });
+  });
+  setActiveService(0);
+
+  if (progress) {
+    gsap.to(progress, {
+      scaleX: 1,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.services-list',
+        start: 'top 58%',
+        end: 'bottom 42%',
+        scrub: true,
+      },
+    });
+  }
+
+  /* En escritorio la escena fija gana aire; en móvil conserva el ritmo compacto. */
+  mm.add('(min-width: 981px)', () => {
+    gsap.to('.services-header > div:first-child', {
+      y: -18,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.services-section',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1,
+      },
+    });
+  });
+
+  /* El fondo final se desplaza a distinta velocidad para crear profundidad. */
+  gsap.utils.toArray('.mesh-orb').forEach((orb, index) => {
+    gsap.to(orb, {
+      yPercent: index % 2 ? -24 : 24,
+      xPercent: index % 2 ? 8 : -8,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.cta-section',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 1.1,
+      },
+    });
+  });
+})();
+
+/* ════════════════════════════════════════
    INTERSECTION OBSERVER — Stats counters
 ════════════════════════════════════════ */
 (function inviewStats() {
@@ -404,17 +558,41 @@ document.getElementById('footer-year').textContent = yr;
 (function galleryInit() {
   const strip = document.getElementById('galleryStrip');
   const bar   = document.getElementById('galleryProgress');
+  const hint  = document.getElementById('gallerySwipeHint');
+  const hintCount = hint?.querySelector('b');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const scrollDriven = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && !reduceMotion;
+
+  if (strip && scrollDriven) strip.classList.add('is-scroll-driven');
 
   /* Progress bar */
   if (strip && bar) {
     strip.addEventListener('scroll', () => {
       const max = strip.scrollWidth - strip.clientWidth;
       bar.style.width = max > 0 ? (strip.scrollLeft / max * 100) + '%' : '0%';
+      hint?.classList.toggle('is-used', strip.scrollLeft > 8);
+
+      if (hintCount) {
+        const items = [...strip.querySelectorAll('[data-gitem]')];
+        const current = items.reduce((closest, item, index) => {
+          const distance = Math.abs(item.offsetLeft - strip.scrollLeft - strip.clientLeft);
+          return distance < closest.distance ? { index, distance } : closest;
+        }, { index: 0, distance: Infinity }).index;
+        hintCount.textContent = `${String(current + 1).padStart(2, '0')} — ${String(items.length).padStart(2, '0')}`;
+      }
     }, { passive: true });
+
+    strip.addEventListener('keydown', event => {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      const direction = event.key === 'ArrowRight' ? 1 : -1;
+      const card = strip.querySelector('[data-gitem]');
+      strip.scrollBy({ left: direction * ((card?.getBoundingClientRect().width || 280) + 12), behavior: 'smooth' });
+    });
   }
 
-  /* Drag to scroll — desktop */
-  if (strip && !isTouch()) {
+  /* Arrastre manual como respaldo cuando no existe el recorrido animado. */
+  if (strip && !isTouch() && !scrollDriven) {
     let down = false, startX, scrollLeft;
     strip.addEventListener('mousedown', e => {
       down = true;
@@ -448,26 +626,80 @@ document.getElementById('footer-year').textContent = yr;
     y: 20, opacity: 0, duration: 0.7, ease: 'power3.out',
   });
 
-  /* Items del strip — entran uno por uno */
-  if (!isTouch()) {
-    gsap.to('[data-gitem]', {
-      scrollTrigger: {
-        trigger: '.gallery-strip',
-        start: 'top 82%',
-      },
-      clipPath: 'inset(0 0% 0 0)',
-      opacity: 1,
-      duration: 0.85,
-      ease: 'power3.out',
-      stagger: 0.12,
-    });
-  } else {
-    /* Mobile — visibles de inmediato */
-    document.querySelectorAll('[data-gitem]').forEach(el => {
-      el.style.opacity   = '1';
-      el.style.clipPath  = 'inset(0 0% 0 0)';
-    });
+  /* Scroll vertical convertido en un recorrido horizontal automático.
+     Funciona igual con rueda, trackpad o gesto vertical en el teléfono. */
+  if (strip && scrollDriven) {
+    const section = document.querySelector('.gallery-section');
+    const horizontalDistance = () => Math.max(0, strip.scrollWidth - strip.clientWidth);
+    const syncGalleryTravel = () => {
+      const travel = Math.max(window.innerHeight * .85, horizontalDistance());
+      section?.style.setProperty('--gallery-travel', `${Math.round(travel)}px`);
+    };
+
+    section?.classList.add('is-scroll-driven-section');
+    syncGalleryTravel();
+
+    gsap.fromTo(strip,
+      { scrollLeft: 0 },
+      {
+        scrollLeft: horizontalDistance,
+        ease: 'none',
+        scrollTrigger: {
+          id: 'gallery-horizontal',
+          trigger: section,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: isTouch() ? .35 : .8,
+          invalidateOnRefresh: true,
+          onRefreshInit: syncGalleryTravel,
+        },
+      }
+    );
+
+    window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
   }
+
+  /* Cortinas ligadas al scroll: avanzan y retroceden también con el dedo. */
+  document.querySelectorAll('[data-gitem]').forEach((item, index) => {
+    if (reduceMotion) {
+      gsap.set(item, { opacity: 1, clipPath: 'inset(0 0% 0 0)' });
+      return;
+    }
+
+    const fromSide = index % 2 === 0 ? 'inset(0 100% 0 0)' : 'inset(0 0 0 100%)';
+    gsap.fromTo(item,
+      { opacity: .2, clipPath: fromSide },
+      {
+        opacity: 1,
+        clipPath: 'inset(0 0% 0 0)',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.gallery-section',
+          start: 'top 88%',
+          end: 'top 34%',
+          scrub: .75,
+        },
+      }
+    );
+
+    const image = item.querySelector('img');
+    if (image) {
+      gsap.fromTo(image,
+        { scale: 1.12, yPercent: -3 },
+        {
+          scale: 1.02,
+          yPercent: 3,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: '.gallery-section',
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1,
+          },
+        }
+      );
+    }
+  });
 })();
 
 /* ════════════════════════════════════════
